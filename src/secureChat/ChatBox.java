@@ -12,11 +12,12 @@ public class ChatBox
 	}
 
 
-	 	private LoginInCertification(String username , String password){
+	public void login(User user)
+	{
+		listOfUsers.add(user);
+	}
 
-	 	}
-
-		public ListOfUsers(){
+		/*public ListOfUsers(){
 
 		}
 
@@ -26,5 +27,5 @@ public class ChatBox
 
 		private ConversationBox(){
 
-		}
+		}*/
 }

@@ -1,11 +1,29 @@
 package secureChat;
 
 public class Message {
-	private string Sender sender;
-	private string Recipient recipient;
-	private string Message message;
+	private User sender;
+	private User recipient;
+	private String message;
 
+	public Message(User Sender,User Recipient, String text)
+	{
+		sender = Sender;
+		recipient = Recipient;
+		message = text;
+	}
 
-	public messages get.messages;
-	return. string message
+	public User getSender()
+	{
+		return sender;
+	}
+
+	public User getRecipient()
+	{
+		return recipient;
+	}
+
+	public String getMessage()
+	{
+		return message;
+	}
 }
