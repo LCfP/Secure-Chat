@@ -16,6 +16,11 @@ public class ChatBox
 	{
 		listOfUsers.add(user);
 	}
+	
+	public ArrayList<User> getUsers()
+	{
+		return listOfUsers;
+	}
 
 		/*public ListOfUsers(){
 

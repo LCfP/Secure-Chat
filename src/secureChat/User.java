@@ -18,6 +18,12 @@ public class User {
 		this.screenName = null;
 
 	}
+	
+	public void setScreenname(String name)
+	{
+		this.screenName = name;
+	}
+	
 	public void CreateUsername(){
 		// TODO must be unique, max length; solve scanner resource leak
 		String name = null;
