@@ -36,8 +36,11 @@ public class SecureChat extends Application {
 	public static Button messageButton;
 	public static ScrollPane messageHistory;
 	public static ScrollPane users;
-	
 	private static User loggedInUser;
+	public static GridPane conversationPane;
+	public static Label senderInput;
+	public static Label messageInput;
+	public static Label timeInput;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -72,6 +75,26 @@ public class SecureChat extends Application {
 		messagePane.setAlignment(Pos.CENTER);
 		messagePane.getChildren().addAll(messageField,messageButton);
 		root.setBottom(messagePane);
+		
+		conversationPane = new GridPane();
+		conversationPane.setPrefWidth(600);
+		conversationPane.setPrefHeight(450);
+		messageHistory.setContent(conversationPane);
+		
+		// TODO replace placeholders with actual sender, message, and time
+		senderInput = new Label("Peterkfdjsa;lkdfjsa;kdfjsa;kdfjsa;kdfjs;kjdfs");
+		messageInput = new Label("Hi");
+		timeInput = new Label("20.15");
+		
+		GridPane.setConstraints(senderInput, 0, 0);
+		GridPane.setConstraints(messageInput, 1, 0);
+		GridPane.setConstraints(timeInput, 2, 0);
+		
+		conversationPane.getColumnConstraints().add(new ColumnConstraints(100));
+		conversationPane.getColumnConstraints().add(new ColumnConstraints(450));
+		conversationPane.getColumnConstraints().add(new ColumnConstraints(50));
+		
+		conversationPane.getChildren().addAll(senderInput, messageInput, timeInput);
 		
 		Stage loginStage = new Stage();
 		GridPane loginPane = new GridPane();
