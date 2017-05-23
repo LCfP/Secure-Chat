@@ -19,26 +19,27 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-public class SecureChat extends Application{
-	
+public class SecureChat extends Application {
+
 	public static BorderPane root;
 	public static TextField loginField;
 	public static Label errorLabel;
 	public static Label nicknameLabel;
 	public static Button loginButton;
-	
+
 	public static ChatBox chatbox;
 	public static ArrayList<Label> userLabels;
 	public static StackPane userPane;
-	
+
 	public static GridPane messagePane;
 	public static TextField messageField;
 	public static Button messageButton;
 	public static ScrollPane messageHistory;
 	public static ScrollPane users;
+	
+	private static User loggedInUser;
 
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		launch(args);
 	}
 
@@ -104,6 +105,7 @@ public class SecureChat extends Application{
 					
 					userPane.getChildren().addAll(userLabels);
 					users.setContent(userPane);
+					loggedInUser = thisUser;
 					
 					loginStage.close();
 					
@@ -115,6 +117,17 @@ public class SecureChat extends Application{
 				}
 			}
 		} );
+		
+
+		messageButton.setOnAction((event)-> //
+		{
+			if(messageField.getText().length() >= 1)
+			{
+				Message thisMessage = new Message(loggedInUser,loggedInUser,messageField.getText());
+			}
+		});
+	
+				
 		
 		GridPane.setConstraints(loginField, 1, 0);
 		GridPane.setConstraints(nicknameLabel, 0, 0);
