@@ -1,5 +1,10 @@
 package secureChat;
+import client.ChatClient;
+import client.ChatClientThread;
 
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import javafx.application.Application;
@@ -22,6 +27,11 @@ import javafx.stage.Stage;
 public class SecureChat extends Application{
 	
 	public static BorderPane root;
+	
+	public static TextField hostField;
+	public static Label hostLabel;
+	public static TextField portField;
+	public static Label portLabel;
 	public static TextField loginField;
 	public static Label errorLabel;
 	public static Label nicknameLabel;
@@ -40,9 +50,13 @@ public class SecureChat extends Application{
 	public static Label senderInput;
 	public static Label messageInput;
 	public static Label timeInput;
+		
+	private static ChatClientThread clientThread = null;
 
 	public static void main(String[] args)
 	{
+		chatbox = new ChatBox();
+		
 		launch(args);
 	}
 
@@ -98,8 +112,12 @@ public class SecureChat extends Application{
 		
 		Stage loginStage = new Stage();
 		GridPane loginPane = new GridPane();
-		Scene loginScene = new Scene(loginPane,400,150);
+		Scene loginScene = new Scene(loginPane,400,300);
 		
+		hostField = new TextField();
+		hostLabel = new Label("Host name: ");
+		portField = new TextField();
+		portLabel = new Label("Port number: ");
 		loginField = new TextField();
 		nicknameLabel = new Label("Nickname: ");
 		errorLabel = new Label("");
@@ -115,7 +133,6 @@ public class SecureChat extends Application{
 					User thisUser = new User();
 					thisUser.setScreenname(loginField.getText());
 					
-					chatbox = new ChatBox();
 					chatbox.login(thisUser);
 					
 					userPane = new StackPane();
@@ -129,6 +146,33 @@ public class SecureChat extends Application{
 					userPane.getChildren().addAll(userLabels);
 					users.setContent(userPane);
 					
+					if(!hostField.getText().equals("") || !portField.getText().equals(""))
+					{
+						String[] arguments = new String[3];
+						
+						arguments[0] = hostField.getText();
+						arguments[1] = portField.getText();
+						arguments[2] = loginField.getText();
+						
+						try {
+				        	Socket socket = new Socket(hostField.getText(),portField.getText());
+				        	clientThread = new ChatClientThread(socket);
+				        	clientThread.start();
+				        	
+				        	User user = new User ();
+				        	user.setScreenname(loginField.getText());
+				        	clientThread.sendUser(user);
+				            
+				        } catch (UnknownHostException e) {
+				            System.err.println("Don't know about host " + hostName);
+				            System.exit(1);
+				        } catch (IOException e) {
+				            System.err.println("Couldn't get I/O for the connection to " +
+				                hostName);
+				            System.exit(1);
+				        }
+					}
+					
 					loginStage.close();
 					
 					primaryStage.show();
@@ -140,18 +184,24 @@ public class SecureChat extends Application{
 			}
 		} );
 		
-		GridPane.setConstraints(loginField, 1, 0);
-		GridPane.setConstraints(nicknameLabel, 0, 0);
-		GridPane.setConstraints(errorLabel, 1, 1);
-		GridPane.setConstraints(loginButton, 1, 2);
+		GridPane.setConstraints(hostField, 1, 0);
+		GridPane.setConstraints(hostLabel, 0, 0);
+		GridPane.setConstraints(portField, 1, 1);
+		GridPane.setConstraints(portLabel, 0, 1);
+		GridPane.setConstraints(loginField, 1, 2);
+		GridPane.setConstraints(nicknameLabel, 0, 2);
+		GridPane.setConstraints(errorLabel, 1, 3);
+		GridPane.setConstraints(loginButton, 1, 4);
 		
+		loginPane.getRowConstraints().add(new RowConstraints(50));
+		loginPane.getRowConstraints().add(new RowConstraints(50));
 		loginPane.getRowConstraints().add(new RowConstraints(50));
 		loginPane.getRowConstraints().add(new RowConstraints(25));
 		loginPane.getRowConstraints().add(new RowConstraints(50));
 		loginPane.getColumnConstraints().add(new ColumnConstraints(75));
 		loginPane.setAlignment(Pos.CENTER);
 		
-		loginPane.getChildren().addAll(loginField,nicknameLabel,errorLabel,loginButton);
+		loginPane.getChildren().addAll(hostField,hostLabel,portField,portLabel,loginField,nicknameLabel,errorLabel,loginButton);
 		loginStage.setScene(loginScene);
 		loginStage.show();		
 	}

@@ -13,7 +13,7 @@ public class ChatServer {
 	public static void main(String[] args) throws IOException {	
 
 		if (args.length != 1) {
-			System.err.println("Usage: java KKMultiServer <port number>");
+			System.err.println("Usage: java ChatServer <port number>");
 			System.exit(1);
 		}
 

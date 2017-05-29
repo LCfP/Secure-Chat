@@ -1,8 +1,11 @@
 package secureChat;
 
+import java.io.Serializable;
 import java.util.Scanner;
 
-public class User {
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 498394893388392L;
 	private String username;
 	private String password;
 	private String securityQuestion;
@@ -117,4 +120,7 @@ public class User {
 		return screenName;
 	}
 
+	public String toString(){
+		return screenName;
+	}
 }
