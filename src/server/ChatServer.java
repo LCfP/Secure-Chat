@@ -10,7 +10,7 @@ import secureChat.User;
 public class ChatServer {
 	private static Set<ChatServerThread> openConnections = new HashSet<ChatServerThread>();
 
-	public static void main(String[] args) throws IOException {	
+	public static void main(String[] args) throws IOException {
 
 		if (args.length != 1) {
 			System.err.println("Usage: java ChatServer <port number>");
@@ -19,7 +19,7 @@ public class ChatServer {
 
 		int portNumber = Integer.parseInt(args[0]);
 		boolean listening = true;
-
+		
 		try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
 			while (listening) {
 				ChatServerThread thread = new ChatServerThread(serverSocket.accept());
@@ -31,7 +31,7 @@ public class ChatServer {
 			System.exit(-1);
 		}
 	}
-	
+
 	public static ChatServerThread getConnectionForUser(String screenname){
 		for ( ChatServerThread thread : openConnections ) {
 			if ( thread.threadForUsername().equals(screenname) ) {
@@ -40,7 +40,7 @@ public class ChatServer {
 		}
 		return null;
 	}
-	
+
 	public static void closeThread(ChatServerThread thread){
 		openConnections.remove(thread);
 	}

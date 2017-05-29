@@ -36,10 +36,12 @@ public class SecureChat extends Application{
 	public static Label errorLabel;
 	public static Label nicknameLabel;
 	public static Button loginButton;
+	public static Button refreshButton;
+	public static Button logoutButton;
 
 	public static ChatBox chatbox;
 	public static ArrayList<Label> userLabels;
-	public static StackPane userPane;
+	public static GridPane userPane;
 
 	public static GridPane messagePane;
 	public static TextField messageField;
@@ -52,6 +54,7 @@ public class SecureChat extends Application{
 	public static Label timeInput;
 
 	private static ChatClientThread clientThread = null;
+	private static User user;
 
 	public static void main(String[] args)
 	{
@@ -83,11 +86,46 @@ public class SecureChat extends Application{
 		messageField.setPrefHeight(100);
 		messageButton = new Button("Send");
 
-		GridPane.setConstraints(messageField, 0, 0);
-		GridPane.setConstraints(messageButton, 1, 0);
+		refreshButton = new Button("Refresh users");
+		refreshButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent arg0)
+			{
+				clientThread.requestUsers();
+
+				userLabels.clear();
+				int labelNo = 0;
+				for(User idx:chatbox.getUsers() )
+				{
+					userLabels.add(new Label(idx.getScreenName()));
+					GridPane.setConstraints(userLabels.get(labelNo),0,labelNo);
+					labelNo++;
+				}
+
+				userPane.getChildren().clear();
+				userPane.getChildren().addAll(userLabels);
+			}
+		});
+
+		logoutButton = new Button("Logout");
+		logoutButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent arg0)
+			{
+				clientThread = null;
+
+				primaryStage.close();
+			}
+		});
+
+
+		GridPane.setConstraints(messageField, 0, 1);
+		GridPane.setConstraints(messageButton, 1, 1);
+		GridPane.setConstraints(refreshButton, 1 ,0);
+		GridPane.setConstraints(logoutButton, 2, 0);
 
 		messagePane.setAlignment(Pos.CENTER);
-		messagePane.getChildren().addAll(messageField,messageButton);
+		messagePane.getChildren().addAll(messageField,messageButton,refreshButton,logoutButton);
 		root.setBottom(messagePane);
 
 		conversationPane = new GridPane();
@@ -124,6 +162,26 @@ public class SecureChat extends Application{
 		errorLabel.setTextFill(Color.RED);
 		loginButton = new Button("Login");
 
+		Stage tempStage = new Stage();
+		StackPane tempPane = new StackPane();
+		Scene tempScene = new Scene(tempPane,200,100);
+		tempStage.setScene(tempScene);
+
+		Button continueButton = new Button("Continue");
+		tempPane.getChildren().add(continueButton);
+
+		continueButton.setOnAction(new EventHandler<ActionEvent>()
+		{
+			public void handle(ActionEvent arg0)
+			{
+				clientThread.sendUser(user);
+
+				tempStage.close();
+
+				primaryStage.show();
+			}
+		});
+
 		loginButton.setOnAction(new EventHandler<ActionEvent>()
 		{
 			public void handle(ActionEvent arg0)
@@ -135,7 +193,7 @@ public class SecureChat extends Application{
 
 					chatbox.login(thisUser);
 
-					userPane = new StackPane();
+					userPane = new GridPane();
 					userLabels = new ArrayList<Label>(0);
 
 					for(User idx:chatbox.getUsers() )
@@ -159,14 +217,8 @@ public class SecureChat extends Application{
 				        	clientThread = new ChatClientThread(socket);
 				        	clientThread.start();
 
-				        	User user = new User ();
+				        	user = new User ();
 				        	user.setScreenname(loginField.getText());
-				        	if(user instanceof User)
-				        		System.out.println("User!");
-
-				        	System.out.println(user.getScreenName());
-
-				        	clientThread.sendUser(user);
 
 				        } catch (UnknownHostException e) {
 				            System.err.println("Don't know about host " + hostField.getText() );
@@ -179,12 +231,11 @@ public class SecureChat extends Application{
 				        	System.err.println("Port number should be an integer");
 				        	System.exit(1);
 				        }
-
 					}
 
 					loginStage.close();
 
-					primaryStage.show();
+					tempStage.show();
 				}
 				else
 				{
@@ -213,5 +264,31 @@ public class SecureChat extends Application{
 		loginPane.getChildren().addAll(hostField,hostLabel,portField,portLabel,loginField,nicknameLabel,errorLabel,loginButton);
 		loginStage.setScene(loginScene);
 		loginStage.show();
+	}
+
+	public static void loginOtherUsers(User[] users)
+	{
+		for(User idx:users)
+		{
+			if(!chatbox.getUsers().contains(idx))
+				chatbox.login(idx);
+		}
+		for(User idx1:chatbox.getUsers())
+		{
+			boolean present = false;
+
+			for(User idx2:users)
+			{
+				if(idx1.equals(idx2))
+				{
+					present = true;
+					break;
+				}
+			}
+
+			if(!present)
+				chatbox.logout(idx1);
+		}
+
 	}
 }

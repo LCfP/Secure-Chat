@@ -21,12 +21,25 @@ public class User implements Serializable {
 		this.screenName = null;
 
 	}
-	
+
 	public void setScreenname(String name)
 	{
 		this.screenName = name;
 	}
-	
+
+	public boolean equals(Object o)
+	{
+		return equals((User) o);
+	}
+
+	public boolean equals(User u)
+	{
+		if(u.getScreenName().equals(screenName))
+			return true;
+		else
+			return false;
+	}
+
 	public void CreateUsername(){
 		// TODO must be unique, max length; solve scanner resource leak
 		String name = null;
