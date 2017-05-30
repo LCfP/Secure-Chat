@@ -1,12 +1,13 @@
 package secureChat;
-import client.ChatClient;
-import client.ChatClientThread;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+import client.ChatClientThread;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,6 +27,8 @@ import javafx.stage.Stage;
 
 public class SecureChat extends Application{
 
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
+	
 	public static BorderPane root;
 
 	public static TextField hostField;
@@ -63,8 +66,10 @@ public class SecureChat extends Application{
 		chatbox = new ChatBox();
 
 		launch(args);
+		Date date = new Date();
+		
 	}
-
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
@@ -138,7 +143,7 @@ public class SecureChat extends Application{
 		// TODO replace placeholders with actual sender, message, and time
 		senderInput = new Label("Peterkfdjsa;lkdfjsa;kdfjsa;kdfjsa;kdfjs;kjdfs");
 		messageInput = new Label("Hi");
-		timeInput = new Label("20.15");
+		timeInput = new Label(sdf.format(new Timestamp(System.currentTimeMillis())));
 
 		GridPane.setConstraints(senderInput, 0, 0);
 		GridPane.setConstraints(messageInput, 1, 0);
