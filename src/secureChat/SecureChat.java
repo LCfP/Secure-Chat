@@ -168,6 +168,7 @@ public class SecureChat extends Application{
 		errorLabel = new Label("");
 		errorLabel.setTextFill(Color.RED);
 		loginButton = new Button("Login");
+		loginButton.setDefaultButton(true);
 
 		Stage tempStage = new Stage();
 		StackPane tempPane = new StackPane();
@@ -186,6 +187,7 @@ public class SecureChat extends Application{
 				tempStage.close();
 
 				primaryStage.show();
+				messageButton.setDefaultButton(true);
 			}
 		});
 
@@ -245,6 +247,7 @@ public class SecureChat extends Application{
 					loginStage.close();
 
 					tempStage.show();
+					continueButton.setDefaultButton(true);
 				}
 				else
 				{
