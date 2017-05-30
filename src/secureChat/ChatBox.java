@@ -16,7 +16,12 @@ public class ChatBox
 	{
 		listOfUsers.add(user);
 	}
-	
+
+	public void logout(User user)
+	{
+		listOfUsers.remove(user);
+	}
+
 	public ArrayList<User> getUsers()
 	{
 		return listOfUsers;

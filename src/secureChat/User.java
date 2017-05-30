@@ -1,8 +1,11 @@
 package secureChat;
 
+import java.io.Serializable;
 import java.util.Scanner;
 
-public class User {
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 498394893388392L;
 	private String username;
 	private String password;
 	private String securityQuestion;
@@ -18,12 +21,25 @@ public class User {
 		this.screenName = null;
 
 	}
-	
+
 	public void setScreenname(String name)
 	{
 		this.screenName = name;
 	}
-	
+
+	public boolean equals(Object o)
+	{
+		return equals((User) o);
+	}
+
+	public boolean equals(User u)
+	{
+		if(u.getScreenName().equals(screenName))
+			return true;
+		else
+			return false;
+	}
+
 	public void CreateUsername(){
 		// TODO must be unique, max length; solve scanner resource leak
 		String name = null;
@@ -117,4 +133,7 @@ public class User {
 		return screenName;
 	}
 
+	public String toString(){
+		return screenName;
+	}
 }
