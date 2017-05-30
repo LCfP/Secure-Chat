@@ -260,6 +260,9 @@ public class SecureChat extends Application{
 			{
 				Message thisMessage = new Message(loggedInUser,loggedInUser,messageField.getText());
 				messageField.setText("");
+				
+				clientThread.sendMessage(thisMessage);
+				
 			}
 		});
 

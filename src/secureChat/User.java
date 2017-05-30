@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class User implements Serializable {
 
-	private static final long serialVersionUID = 498394893388392L;
+	private static final long serialVersionUID = -7840329869204260407L;
 	private String username;
 	private String password;
 	private String securityQuestion;
