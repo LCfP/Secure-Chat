@@ -147,6 +147,7 @@ public class SecureChat extends Application {
 			if(messageField.getText().length() >= 1)
 			{
 				Message thisMessage = new Message(loggedInUser,loggedInUser,messageField.getText());
+				messageField.setText("");
 			}
 		});
 	
