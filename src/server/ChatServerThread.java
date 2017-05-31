@@ -48,6 +48,8 @@ public class ChatServerThread extends Thread {
             } while ( user == null );
 
             out.writeObject(new String("Logged in, please send a Message object or request logged in Users"));
+            ChatServer.sendUsers();
+
             boolean keepGoing = true;
             while (keepGoing) {
 
@@ -75,6 +77,10 @@ public class ChatServerThread extends Thread {
             ChatServer.closeThread(this);
         }
     }
+
+	public void forwardUsers(secureChat.User[] users) throws IOException{
+		out.writeObject(users);
+	}
 
 	public void forwardMessage(secureChat.Message message) throws IOException{
 		out.writeObject(message);

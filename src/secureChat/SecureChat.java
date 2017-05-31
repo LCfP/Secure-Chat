@@ -17,6 +17,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -28,7 +30,7 @@ import javafx.stage.Stage;
 public class SecureChat extends Application{
 
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
-	
+
 	public static BorderPane root;
 
 	public static TextField hostField;
@@ -39,12 +41,12 @@ public class SecureChat extends Application{
 	public static Label errorLabel;
 	public static Label nicknameLabel;
 	public static Button loginButton;
-	
-	public static Button refreshButton;
+	public static Button continueButton;
 	public static Button logoutButton;
 
-	public static ChatBox chatbox;
-	public static ArrayList<Label> userLabels;
+	public static ToggleGroup userGroup = new ToggleGroup();
+
+	public static ArrayList<ToggleButton> userButtons;
 	public static GridPane userPane;
 
 	public static GridPane messagePane;
@@ -52,7 +54,9 @@ public class SecureChat extends Application{
 	public static Button messageButton;
 	public static ScrollPane messageHistory;
 	public static ScrollPane users;
-	private static User loggedInUser;
+
+	private static ArrayList<User> loggedInUsers;
+
 	public static GridPane conversationPane;
 	public static Label senderInput;
 	public static Label messageInput;
@@ -63,13 +67,12 @@ public class SecureChat extends Application{
 
 	public static void main(String[] args)
 	{
-		chatbox = new ChatBox();
 
 		launch(args);
 		Date date = new Date();
-		
+
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
@@ -93,27 +96,6 @@ public class SecureChat extends Application{
 		messageField.setPrefHeight(100);
 		messageButton = new Button("Send");
 
-		refreshButton = new Button("Refresh users");
-		refreshButton.setOnAction(new EventHandler<ActionEvent>()
-		{
-			public void handle(ActionEvent arg0)
-			{
-				clientThread.requestUsers();
-
-				userLabels.clear();
-				int labelNo = 0;
-				for(User idx:chatbox.getUsers() )
-				{
-					userLabels.add(new Label(idx.getScreenName()));
-					GridPane.setConstraints(userLabels.get(labelNo),0,labelNo);
-					labelNo++;
-				}
-
-				userPane.getChildren().clear();
-				userPane.getChildren().addAll(userLabels);
-			}
-		});
-
 		logoutButton = new Button("Logout");
 		logoutButton.setOnAction(new EventHandler<ActionEvent>()
 		{
@@ -128,11 +110,10 @@ public class SecureChat extends Application{
 
 		GridPane.setConstraints(messageField, 0, 1);
 		GridPane.setConstraints(messageButton, 1, 1);
-		GridPane.setConstraints(refreshButton, 1 ,0);
-		GridPane.setConstraints(logoutButton, 2, 0);
+		GridPane.setConstraints(logoutButton, 1, 0);
 
 		messagePane.setAlignment(Pos.CENTER);
-		messagePane.getChildren().addAll(messageField,messageButton,refreshButton,logoutButton);
+		messagePane.getChildren().addAll(messageField,messageButton,logoutButton);
 		root.setBottom(messagePane);
 
 		conversationPane = new GridPane();
@@ -175,7 +156,7 @@ public class SecureChat extends Application{
 		Scene tempScene = new Scene(tempPane,200,100);
 		tempStage.setScene(tempScene);
 
-		Button continueButton = new Button("Continue");
+		continueButton = new Button("Continue");
 		tempPane.getChildren().add(continueButton);
 
 		continueButton.setOnAction(new EventHandler<ActionEvent>()
@@ -197,22 +178,19 @@ public class SecureChat extends Application{
 			{
 				if(loginField.getText().length() >= 3)
 				{
-					User thisUser = new User();
-					thisUser.setScreenname(loginField.getText());
-
-					chatbox.login(thisUser);
+					loggedInUsers = new ArrayList<User>(0);
+					loggedInUsers.add( new User() );
+					loggedInUsers.get(0).setScreenname(loginField.getText());
 
 					userPane = new GridPane();
-					userLabels = new ArrayList<Label>(0);
+					userButtons = new ArrayList<ToggleButton>(0);
 
-					for(User idx:chatbox.getUsers() )
-					{
-						userLabels.add(new Label(idx.getScreenName()));
-					}
+					userButtons.add(new ToggleButton(loggedInUsers.get(0).getScreenName()));
+					userButtons.get(0).setSelected(true);
+					userButtons.get(0).setToggleGroup(userGroup);
 
-					userPane.getChildren().addAll(userLabels);
+					userPane.getChildren().add(userButtons.get(0) );
 					users.setContent(userPane);
-					loggedInUser = thisUser;
 
 
 					if(!hostField.getText().equals("") || !portField.getText().equals(""))
@@ -250,17 +228,28 @@ public class SecureChat extends Application{
 				}
 			}
 		} );
-		
+
 
 		messageButton.setOnAction((event)-> //
 		{
 			if(messageField.getText().length() >= 1)
 			{
-				Message thisMessage = new Message(loggedInUser,loggedInUser,messageField.getText());
+				User recipient = null;
+
+				for(int idx=0;idx<userButtons.size();++idx)
+				{
+					if(userButtons.get(idx).isSelected() )
+					{
+						recipient = loggedInUsers.get(idx);
+						break;
+					}
+				}
+
+				Message thisMessage = new Message(loggedInUsers.get(0),recipient,messageField.getText());
 				messageField.setText("");
-				
+
 				clientThread.sendMessage(thisMessage);
-				
+
 			}
 		});
 
@@ -286,20 +275,27 @@ public class SecureChat extends Application{
 		loginStage.show();
 	}
 
-	public static void loginOtherUsers(User[] users)
+	public static void loginOtherUsers(User[] object)
 	{
-		for(User idx:users)
+		userPane.getChildren().clear();
+		for(User idx:object)
 		{
-			if(!chatbox.getUsers().contains(idx))
-				chatbox.login(idx);
+			if(!loggedInUsers.contains(idx))
+			{
+				loggedInUsers.add(idx);
+				ToggleButton button = new ToggleButton(idx.getScreenName());
+				button.setToggleGroup(userGroup);
+				userButtons.add(button);
+			}
 		}
-		for(User idx1:chatbox.getUsers())
+
+		for(User idx1:loggedInUsers)
 		{
 			boolean present = false;
 
-			for(User idx2:users)
+			for(User idx2:object)
 			{
-				if(idx1.equals(idx2))
+				if(idx2.equals(idx1))
 				{
 					present = true;
 					break;
@@ -307,8 +303,15 @@ public class SecureChat extends Application{
 			}
 
 			if(!present)
-				chatbox.logout(idx1);
+			{
+				userButtons.remove(loggedInUsers.indexOf(idx1));
+				loggedInUsers.remove(idx1);
+			}
 		}
 
+		for(int idx=0;idx<userButtons.size();idx++)
+			GridPane.setConstraints(userButtons.get(idx), 0, idx);
+
+		userPane.getChildren().addAll(userButtons);
 	}
 }

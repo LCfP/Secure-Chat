@@ -19,7 +19,7 @@ public class ChatServer {
 
 		int portNumber = Integer.parseInt(args[0]);
 		boolean listening = true;
-		
+
 		try (ServerSocket serverSocket = new ServerSocket(portNumber)) {
 			while (listening) {
 				ChatServerThread thread = new ChatServerThread(serverSocket.accept());
@@ -54,4 +54,11 @@ public class ChatServer {
 		return users;
 	}
 
+	public static void sendUsers() throws IOException{
+		User[] users = getUsers();
+
+		for( ChatServerThread thread : openConnections ){
+			thread.forwardUsers(users);
+		}
+	}
 }
