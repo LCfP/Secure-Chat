@@ -1,12 +1,13 @@
 package secureChat;
-import client.ChatClient;
-import client.ChatClientThread;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
+import client.ChatClientThread;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -26,6 +27,8 @@ import javafx.stage.Stage;
 
 public class SecureChat extends Application{
 
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
+	
 	public static BorderPane root;
 
 	public static TextField hostField;
@@ -36,6 +39,7 @@ public class SecureChat extends Application{
 	public static Label errorLabel;
 	public static Label nicknameLabel;
 	public static Button loginButton;
+	
 	public static Button refreshButton;
 	public static Button logoutButton;
 
@@ -48,6 +52,7 @@ public class SecureChat extends Application{
 	public static Button messageButton;
 	public static ScrollPane messageHistory;
 	public static ScrollPane users;
+	private static User loggedInUser;
 	public static GridPane conversationPane;
 	public static Label senderInput;
 	public static Label messageInput;
@@ -61,8 +66,10 @@ public class SecureChat extends Application{
 		chatbox = new ChatBox();
 
 		launch(args);
+		Date date = new Date();
+		
 	}
-
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception
 	{
@@ -136,7 +143,7 @@ public class SecureChat extends Application{
 		// TODO replace placeholders with actual sender, message, and time
 		senderInput = new Label("Peterkfdjsa;lkdfjsa;kdfjsa;kdfjsa;kdfjs;kjdfs");
 		messageInput = new Label("Hi");
-		timeInput = new Label("20.15");
+		timeInput = new Label(sdf.format(new Timestamp(System.currentTimeMillis())));
 
 		GridPane.setConstraints(senderInput, 0, 0);
 		GridPane.setConstraints(messageInput, 1, 0);
@@ -161,6 +168,7 @@ public class SecureChat extends Application{
 		errorLabel = new Label("");
 		errorLabel.setTextFill(Color.RED);
 		loginButton = new Button("Login");
+		loginButton.setDefaultButton(true);
 
 		Stage tempStage = new Stage();
 		StackPane tempPane = new StackPane();
@@ -179,6 +187,7 @@ public class SecureChat extends Application{
 				tempStage.close();
 
 				primaryStage.show();
+				messageButton.setDefaultButton(true);
 			}
 		});
 
@@ -203,6 +212,8 @@ public class SecureChat extends Application{
 
 					userPane.getChildren().addAll(userLabels);
 					users.setContent(userPane);
+					loggedInUser = thisUser;
+
 
 					if(!hostField.getText().equals("") || !portField.getText().equals(""))
 					{
@@ -231,6 +242,7 @@ public class SecureChat extends Application{
 					loginStage.close();
 
 					tempStage.show();
+					continueButton.setDefaultButton(true);
 				}
 				else
 				{
@@ -238,6 +250,19 @@ public class SecureChat extends Application{
 				}
 			}
 		} );
+		
+
+		messageButton.setOnAction((event)-> //
+		{
+			if(messageField.getText().length() >= 1)
+			{
+				Message thisMessage = new Message(loggedInUser,loggedInUser,messageField.getText());
+				messageField.setText("");
+				
+				clientThread.sendMessage(thisMessage);
+				
+			}
+		});
 
 		GridPane.setConstraints(hostField, 1, 0);
 		GridPane.setConstraints(hostLabel, 0, 0);
