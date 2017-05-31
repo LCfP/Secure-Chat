@@ -36,15 +36,21 @@ public class ChatClientThread extends Thread {
             	} else if ( object instanceof User[] ) {
             		System.out.println("Received Userlist");
             		SecureChat.loginOtherUsers((User[]) object);
+            	} else if ( object instanceof Integer ){
+            		if( (int)object == 1 )
+            		{
+            			System.out.println("Screenname already taken");
+                		SecureChat.screennameTaken();
+            		}
             	} else {
             		System.out.println( "from server: " + object);
             	}
             }
-            ChatClient.closeThread(this);
+            SecureChat.closeThread(this);
             socket.close();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
-            ChatClient.closeThread(this);
+            SecureChat.closeThread(this);
         }
     }
 
@@ -70,6 +76,15 @@ public class ChatClientThread extends Thread {
 	public void requestUsers(){
 		try{
 			out.writeObject(null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void logout(){
+		try{
+			out.writeObject(1);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

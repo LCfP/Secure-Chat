@@ -31,6 +31,8 @@ public class SecureChat extends Application{
 
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("HH.mm");
 
+	public static Stage loginStage;
+	public static Stage primaryStage;
 	public static BorderPane root;
 
 	public static TextField hostField;
@@ -74,8 +76,9 @@ public class SecureChat extends Application{
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws Exception
+	public void start(Stage mainStage) throws Exception
 	{
+		primaryStage = mainStage;
 		root = new BorderPane();
 		Scene primaryScene = new Scene(root,800,600);
 		primaryStage.setScene(primaryScene);
@@ -101,7 +104,8 @@ public class SecureChat extends Application{
 		{
 			public void handle(ActionEvent arg0)
 			{
-				clientThread = null;
+				clientThread.logout();
+				closeThread(clientThread);
 
 				primaryStage.close();
 			}
@@ -136,7 +140,7 @@ public class SecureChat extends Application{
 
 		conversationPane.getChildren().addAll(senderInput, messageInput, timeInput);
 
-		Stage loginStage = new Stage();
+		loginStage = new Stage();
 		GridPane loginPane = new GridPane();
 		Scene loginScene = new Scene(loginPane,400,300);
 
@@ -313,5 +317,20 @@ public class SecureChat extends Application{
 			GridPane.setConstraints(userButtons.get(idx), 0, idx);
 
 		userPane.getChildren().addAll(userButtons);
+	}
+
+	public static void closeThread(ChatClientThread chatClientThread) {
+		if (clientThread.equals(chatClientThread) ) {
+			clientThread = null;
+		}
+
+	}
+
+	public static void screennameTaken() {
+		primaryStage.close();
+
+		loginStage.show();
+		loginButton.setDefaultButton(true);
+
 	}
 }

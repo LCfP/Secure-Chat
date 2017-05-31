@@ -42,6 +42,7 @@ public class ChatServer {
 	}
 
 	public static void closeThread(ChatServerThread thread){
+		System.out.println("Thread removed");
 		openConnections.remove(thread);
 	}
 

@@ -44,6 +44,9 @@ public class ChatServerThread extends Thread {
             	if ( object instanceof secureChat.User && ChatServer.getConnectionForUser(((secureChat.User)object).getScreenName()) == null ) {
             		System.out.println("Found user object for which no connection exists");
             		this.user = (secureChat.User)object;
+            	} else if ( object instanceof secureChat.User )
+            	{
+            		out.writeObject(1);
             	}
             } while ( user == null );
 
@@ -63,7 +66,11 @@ public class ChatServerThread extends Thread {
             		if ( connection != null ){
             			connection.forwardMessage(message);
             		}
-            	} else {
+            	} else if ( object instanceof Integer ) {
+            		if( (int)object == 1 )
+            			ChatServer.closeThread(this);
+            	}
+            	else {
             		User[] users = ChatServer.getUsers();
             		out.writeObject(users);
             	}
