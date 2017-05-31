@@ -206,11 +206,6 @@ public class SecureChat extends Application{
 
 					if(!hostField.getText().equals("") || !portField.getText().equals(""))
 					{
-						String[] arguments = new String[3];
-
-						arguments[0] = hostField.getText();
-						arguments[1] = portField.getText();
-						arguments[2] = loginField.getText();
 
 						try {
 				        	Socket socket = new Socket(hostField.getText(),Integer.parseInt(portField.getText() ) );
