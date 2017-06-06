@@ -32,7 +32,7 @@ public class ChatClientThread extends Thread {
             	Object object = in.readObject();
             	if ( object instanceof secureChat.Message ) {
             		System.out.println("Received Message:");
-            		System.out.println((secureChat.Message)object);
+            		SecureChat.printMessage((secureChat.Message)object);
             	} else if ( object instanceof User[] ) {
             		System.out.println("Received Userlist");
             		SecureChat.loginOtherUsers((User[]) object);

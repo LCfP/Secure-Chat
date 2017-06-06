@@ -60,9 +60,9 @@ public class SecureChat extends Application{
 	private static ArrayList<User> loggedInUsers;
 
 	public static GridPane conversationPane;
-	public static Label senderInput;
-	public static Label messageInput;
-	public static Label timeInput;
+	public static ArrayList<Label> senderInput;
+	public static ArrayList<Label> messageInput;
+	public static ArrayList<Label> timeInput;
 
 	private static ChatClientThread clientThread = null;
 	private static User user;
@@ -73,6 +73,20 @@ public class SecureChat extends Application{
 		launch(args);
 		Date date = new Date();
 
+	}
+	
+	public static void printMessage(Message m)
+	{
+		senderInput.add(new Label(m.getSender().getScreenName()));
+		messageInput.add(new Label(m.getMessage()));
+		timeInput.add(new Label(sdf.format(new Timestamp(System.currentTimeMillis()))));
+
+		GridPane.setConstraints(senderInput.get(senderInput.size()-1), 0, senderInput.size()-1);
+		GridPane.setConstraints(messageInput.get(messageInput.size()-1), 1, messageInput.size()-1);
+		GridPane.setConstraints(timeInput.get(timeInput.size()-1), 2, timeInput.size()-1);
+
+
+		conversationPane.getChildren().addAll(senderInput.get(senderInput.size()-1), messageInput.get(messageInput.size()-1), timeInput.get(timeInput.size()-1));
 	}
 
 	@Override
@@ -111,7 +125,6 @@ public class SecureChat extends Application{
 			}
 		});
 
-
 		GridPane.setConstraints(messageField, 0, 1);
 		GridPane.setConstraints(messageButton, 1, 1);
 		GridPane.setConstraints(logoutButton, 1, 0);
@@ -125,20 +138,15 @@ public class SecureChat extends Application{
 		conversationPane.setPrefHeight(450);
 		messageHistory.setContent(conversationPane);
 
-		// TODO replace placeholders with actual sender, message, and time
-		senderInput = new Label("Peterkfdjsa;lkdfjsa;kdfjsa;kdfjsa;kdfjs;kjdfs");
-		messageInput = new Label("Hi");
-		timeInput = new Label(sdf.format(new Timestamp(System.currentTimeMillis())));
-
-		GridPane.setConstraints(senderInput, 0, 0);
-		GridPane.setConstraints(messageInput, 1, 0);
-		GridPane.setConstraints(timeInput, 2, 0);
-
 		conversationPane.getColumnConstraints().add(new ColumnConstraints(100));
 		conversationPane.getColumnConstraints().add(new ColumnConstraints(450));
 		conversationPane.getColumnConstraints().add(new ColumnConstraints(50));
-
-		conversationPane.getChildren().addAll(senderInput, messageInput, timeInput);
+		
+		senderInput = new ArrayList<Label>(0);
+		messageInput = new ArrayList<Label>(0);
+		timeInput = new ArrayList<Label>(0);
+		/*conversationPane.addKeyListener();*/
+		
 
 		loginStage = new Stage();
 		GridPane loginPane = new GridPane();
@@ -247,6 +255,10 @@ public class SecureChat extends Application{
 						recipient = loggedInUsers.get(idx);
 						break;
 					}
+				}
+				if(recipient.equals(null))
+				{
+					
 				}
 
 				Message thisMessage = new Message(loggedInUsers.get(0),recipient,messageField.getText());
