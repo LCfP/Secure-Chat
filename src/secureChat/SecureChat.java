@@ -9,6 +9,7 @@ import java.util.Date;
 
 import client.ChatClientThread;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
@@ -71,25 +72,28 @@ public class SecureChat extends Application{
 	{
 
 		launch(args);
-		Date date = new Date();
-
 	}
-	
+
 	public static void printMessage(Message m)
 	{
-		senderInput.add(new Label(m.getSender().getScreenName()));
-		messageInput.add(new Label(m.getMessage()));
-		timeInput.add(new Label(sdf.format(new Timestamp(System.currentTimeMillis()))));
+		Platform.runLater(new Runnable()
+		{
+			public void run()
+			{
+				senderInput.add(new Label(m.getSender().getScreenName()));
+				messageInput.add(new Label(m.getMessage()));
+				timeInput.add(new Label(sdf.format(new Timestamp(System.currentTimeMillis()))));
 
-		GridPane.setConstraints(senderInput.get(senderInput.size()-1), 0, senderInput.size()-1);
-		GridPane.setConstraints(messageInput.get(messageInput.size()-1), 1, messageInput.size()-1);
-		GridPane.setConstraints(timeInput.get(timeInput.size()-1), 2, timeInput.size()-1);
+				GridPane.setConstraints(senderInput.get(senderInput.size()-1), 0, senderInput.size()-1);
+				GridPane.setConstraints(messageInput.get(messageInput.size()-1), 1, messageInput.size()-1);
+				GridPane.setConstraints(timeInput.get(timeInput.size()-1), 2, timeInput.size()-1);
 
+				conversationPane.getChildren().addAll(senderInput.get(senderInput.size()-1), messageInput.get(messageInput.size()-1), timeInput.get(timeInput.size()-1));
+			}
 
-		conversationPane.getChildren().addAll(senderInput.get(senderInput.size()-1), messageInput.get(messageInput.size()-1), timeInput.get(timeInput.size()-1));
+		});
 	}
 
-	@Override
 	public void start(Stage mainStage) throws Exception
 	{
 		primaryStage = mainStage;
@@ -141,12 +145,12 @@ public class SecureChat extends Application{
 		conversationPane.getColumnConstraints().add(new ColumnConstraints(100));
 		conversationPane.getColumnConstraints().add(new ColumnConstraints(450));
 		conversationPane.getColumnConstraints().add(new ColumnConstraints(50));
-		
+
 		senderInput = new ArrayList<Label>(0);
 		messageInput = new ArrayList<Label>(0);
 		timeInput = new ArrayList<Label>(0);
 		/*conversationPane.addKeyListener();*/
-		
+
 
 		loginStage = new Stage();
 		GridPane loginPane = new GridPane();
@@ -256,16 +260,18 @@ public class SecureChat extends Application{
 						break;
 					}
 				}
-				if(recipient.equals(null))
+				if(recipient == null)
 				{
-					
+
 				}
+				else
+				{
 
-				Message thisMessage = new Message(loggedInUsers.get(0),recipient,messageField.getText());
-				messageField.setText("");
+					Message thisMessage = new Message(loggedInUsers.get(0),recipient,messageField.getText());
+					messageField.setText("");
 
-				clientThread.sendMessage(thisMessage);
-
+					clientThread.sendMessage(thisMessage);
+				}
 			}
 		});
 
@@ -293,42 +299,52 @@ public class SecureChat extends Application{
 
 	public static void loginOtherUsers(User[] object)
 	{
-		userPane.getChildren().clear();
-		for(User idx:object)
-		{
-			if(!loggedInUsers.contains(idx))
-			{
-				loggedInUsers.add(idx);
-				ToggleButton button = new ToggleButton(idx.getScreenName());
-				button.setToggleGroup(userGroup);
-				userButtons.add(button);
-			}
-		}
 
-		for(User idx1:loggedInUsers)
+		Platform.runLater(new Runnable()
 		{
-			boolean present = false;
-
-			for(User idx2:object)
+			public void run()
 			{
-				if(idx2.equals(idx1))
+				userPane.getChildren().clear();
+
+				for(User idx:object)
 				{
-					present = true;
-					break;
+					if(!loggedInUsers.contains(idx))
+					{
+						loggedInUsers.add(idx);
+						ToggleButton button = new ToggleButton(idx.getScreenName());
+						button.setToggleGroup(userGroup);
+						userButtons.add(button);
+					}
 				}
+
+				for(User idx1:loggedInUsers)
+				{
+					boolean present = false;
+
+					for(User idx2:object)
+					{
+						if(idx2.equals(idx1))
+						{
+							present = true;
+							break;
+						}
+					}
+
+					if(!present)
+					{
+						userButtons.remove(loggedInUsers.indexOf(idx1));
+						loggedInUsers.remove(idx1);
+					}
+				}
+
+				for(int idx=0;idx<userButtons.size();idx++)
+					GridPane.setConstraints(userButtons.get(idx), 0, idx);
+
+				userPane.getChildren().addAll(userButtons);
 			}
 
-			if(!present)
-			{
-				userButtons.remove(loggedInUsers.indexOf(idx1));
-				loggedInUsers.remove(idx1);
-			}
-		}
+		});
 
-		for(int idx=0;idx<userButtons.size();idx++)
-			GridPane.setConstraints(userButtons.get(idx), 0, idx);
-
-		userPane.getChildren().addAll(userButtons);
 	}
 
 	public static void closeThread(ChatClientThread chatClientThread) {
