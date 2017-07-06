@@ -270,6 +270,21 @@ public class SecureChat extends Application{
 					Message thisMessage = new Message(loggedInUsers.get(0),recipient,messageField.getText());
 					messageField.setText("");
 
+					senderInput.add(new Label(thisMessage.getRecipient().getScreenName()));
+					messageInput.add(new Label(thisMessage.getMessage()));
+					timeInput.add(new Label(sdf.format(new Timestamp(System.currentTimeMillis()))));
+
+					senderInput.get(senderInput.size()-1).setTextFill(Color.RED);
+					messageInput.get(senderInput.size()-1).setTextFill(Color.RED);
+					timeInput.get(senderInput.size()-1).setTextFill(Color.RED);
+
+					GridPane.setConstraints(senderInput.get(senderInput.size()-1), 0, senderInput.size()-1);
+					GridPane.setConstraints(messageInput.get(messageInput.size()-1), 1, messageInput.size()-1);
+					GridPane.setConstraints(timeInput.get(timeInput.size()-1), 2, timeInput.size()-1);
+
+					conversationPane.getChildren().addAll(senderInput.get(senderInput.size()-1), messageInput.get(messageInput.size()-1), timeInput.get(timeInput.size()-1));
+
+
 					clientThread.sendMessage(thisMessage);
 				}
 			}
