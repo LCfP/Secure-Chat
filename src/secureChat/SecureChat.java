@@ -126,6 +126,7 @@ public class SecureChat extends Application{
 				closeThread(clientThread);
 
 				primaryStage.close();
+				System.exit(0);
 			}
 		});
 
